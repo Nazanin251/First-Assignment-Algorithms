@@ -9,7 +9,14 @@ public class Exercises {
         note: you should return the indices in ascending order and every array's solution is unique
     */
     public int[] productIndices(int[] values, int target) {
+
         // todo
+        for(int i=0 ; i<value.length ; i++){
+            for(int j=0 ; j<i ; j++){
+                int result= value[i]*value[j];
+                if(result==target) System.out.println("{"+j+", "+i+"}");
+            }
+        }
         return null;
     }
 
@@ -26,6 +33,58 @@ public class Exercises {
     */
     public int[] spiralTraversal(int[][] values, int rows, int cols) {
         // todo
+        int top = 0, bottom = cols - 1, left = 0, right = rows - 1;
+        System.out.print("{");
+        int sum=0;
+
+        // Keep looping until we’ve covered the whole matrix
+        while (top <= bottom && left <= right) {
+           
+            for (int i = left; i <= right; ++i) {
+                System.out.print(values[top][i]);
+
+                sum++;
+                if(sum<=rows) System.out.print(",");
+                
+            }
+            top++;// Move the top boundary down
+            
+    
+            
+            for (int i = top; i <= bottom; ++i) {
+                System.out.print(values[i][right]);
+                System.out.print(",");
+            }
+            right--;// Move the right boundary left
+           
+    
+            
+            if (top <= bottom) {
+                for (int i = right; i >= left; --i) {
+                    System.out.print(values[bottom][i]);
+                    System.out.print(",");
+                }
+                bottom--;// Move the bottom boundary up
+            }
+            
+            
+            if (left <= right) {
+                for (int i = bottom; i >= top; --i) {
+                    
+                    System.out.print(values[i][left]);
+                    System.out.print(",");
+
+                   
+                }
+                
+               
+            }
+                left++;// Move the left boundary right
+        }
+        System.out.print("}");
+        
+    
+    
         return null;
     }
 
@@ -55,6 +114,45 @@ public class Exercises {
     */
     public int[][] intPartitions(int n) {
         // todo
+        nt maxPartitions = 100; 
+        int[][] partitions = new int[maxPartitions][n];  
+        int count = 0;
+
+        
+        int[] partition = new int[n];
+        
+       
+        int[] stack = new int[n + 1];  // Stack to hold the current state
+        int stackPointer = 0;
+
+        stack[stackPointer++] = n; 
+        stack[stackPointer++] = n;  
+        stack[stackPointer++] = 0;  
+
+        while (stackPointer > 0) {
+            int max = stack[--stackPointer];
+            int currentN = stack[--stackPointer];
+            int index = stack[--stackPointer];
+
+            if (currentN == 0) {
+               
+                for (int i = 0; i < index; i++) {
+                    System.out.print(partition[i] + " "); 
+                }
+                System.out.println();
+                count++;
+                continue;
+            }
+
+           
+            for (int i = Math.min(currentN, max); i >= 1; i--) {
+                partition[index] = i; 
+                stack[stackPointer++] = currentN - i;  // Update remaining sum
+                stack[stackPointer++] = i; // Update max value for the next step
+                stack[stackPointer++] = index + 1;  
+            }
+        }
+        
         return null;
     }
 
