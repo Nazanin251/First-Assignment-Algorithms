@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.List;
+
 public class Exercises {
 
     /*
@@ -112,49 +115,42 @@ public class Exercises {
 
         if you're familiar with lists and arraylists, you can also edit method's body to use them instead of array
     */
-    public int[][] intPartitions(int n) {
-        // todo
-        nt maxPartitions = 100; 
-        int[][] partitions = new int[maxPartitions][n];  
-        int count = 0;
+    public int[][] intPartitions(int n)
+        {
+            List<List<Integer>> result = new ArrayList<>();
 
-        
-        int[] partition = new int[n];
-        
-       
-        int[] stack = new int[n + 1];  // Stack to hold the current state
-        int stackPointer = 0;
+            partitionGeneration(n, n, new ArrayList<>(), result);
 
-        stack[stackPointer++] = n; 
-        stack[stackPointer++] = n;  
-        stack[stackPointer++] = 0;  
-
-        while (stackPointer > 0) {
-            int max = stack[--stackPointer];
-            int currentN = stack[--stackPointer];
-            int index = stack[--stackPointer];
-
-            if (currentN == 0) {
-               
-                for (int i = 0; i < index; i++) {
-                    System.out.print(partition[i] + " "); 
+            // Convert the list of lists to an array
+            int[][] finalResult = new int[result.size()][];
+            for (int i = 0; i < result.size(); i++)
+            {
+                finalResult[i] = new int[result.get(i).size()];
+                for (int j = 0; j < result.get(i).size(); j++)
+                {
+                    finalResult[i][j] = result.get(i).get(j);
                 }
-                System.out.println();
-                count++;
-                continue;
+            }
+            return finalResult;
+        }
+
+        // Recursive function for partition generation
+        private void partitionGeneration(int n, int max, List<Integer> current, List<List<Integer>> result)
+        {
+            if (n == 0)
+            {
+                result.add(new ArrayList<>(current)); // Add the current partition to the result
+                return;
             }
 
-           
-            for (int i = Math.min(currentN, max); i >= 1; i--) {
-                partition[index] = i; 
-                stack[stackPointer++] = currentN - i;  // Update remaining sum
-                stack[stackPointer++] = i; // Update max value for the next step
-                stack[stackPointer++] = index + 1;  
+            // Iterate from max to 1 to generate unique partitions
+            for (int i = Math.min(max, n); i >= 1; i--)
+            {
+                current.add(i);
+                partitionGeneration(n - i, i, current, result);
+                current.remove(current.size() - 1);
             }
         }
-        
-        return null;
-    }
 
     public static void main(String[] args) {
         // you can test your code here
