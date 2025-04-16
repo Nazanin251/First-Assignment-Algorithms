@@ -1,6 +1,3 @@
-import java.util.ArrayList;
-import java.util.List;
-
 public class Exercises {
 
     /*
@@ -12,15 +9,20 @@ public class Exercises {
         note: you should return the indices in ascending order and every array's solution is unique
     */
     public int[] productIndices(int[] values, int target) {
-
-        // todo
-        for(int i=0 ; i<value.length ; i++){
-            for(int j=0 ; j<i ; j++){
-                int result= value[i]*value[j];
-                if(result==target) System.out.println("{"+j+", "+i+"}");
+        int firstNum, secondNum;
+        int[] answer = new int [2];
+        for (int i = 0 ; i < values.length - 1 ; i++) {
+            firstNum = values[i];
+            for (int j = i + 1 ; j < values.length ; j++) {
+                secondNum = values[j];
+                if (firstNum * secondNum == target) {
+                    answer[0] = i;
+                    answer[1] = j;
+                    return answer;
+                }
             }
         }
-        return null;
+        return answer;
     }
 
     /*
@@ -35,60 +37,52 @@ public class Exercises {
         so you should walk in that matrix in a curl and then add the numbers in order you've seen them in a 1D array
     */
     public int[] spiralTraversal(int[][] values, int rows, int cols) {
-        // todo
-        int top = 0, bottom = cols - 1, left = 0, right = rows - 1;
-        System.out.print("{");
-        int sum=0;
-
-        // Keep looping until we’ve covered the whole matrix
-        while (top <= bottom && left <= right) {
-           
-            for (int i = left; i <= right; ++i) {
-                System.out.print(values[top][i]);
-
-                sum++;
-                if(sum<=rows) System.out.print(",");
-                
-            }
-            top++;// Move the top boundary down
-            
-    
-            
-            for (int i = top; i <= bottom; ++i) {
-                System.out.print(values[i][right]);
-                System.out.print(",");
-            }
-            right--;// Move the right boundary left
-           
-    
-            
-            if (top <= bottom) {
-                for (int i = right; i >= left; --i) {
-                    System.out.print(values[bottom][i]);
-                    System.out.print(",");
+        int toRight = cols;
+        int toDown = rows - 1;
+        int toLeft = cols - 1;
+        int toUp = rows - 2;
+        int[] answer = new int [rows * cols];
+        int r = 0;
+        int c = -1;
+        for (int k = 0 ; k < rows * cols ;) {
+            if (k < rows * cols) {
+                for (int i = 0 ; i < toRight ; i++) {
+                    c++;
+                    answer [k] = values[r][c];
+                    k++;
                 }
-                bottom--;// Move the bottom boundary up
+                toRight -= 2;
             }
-            
-            
-            if (left <= right) {
-                for (int i = bottom; i >= top; --i) {
-                    
-                    System.out.print(values[i][left]);
-                    System.out.print(",");
 
-                   
+            if (k < rows * cols) {
+                for (int i = 0 ; i < toDown ; i++) {
+                    r++;
+                    answer [k] = values[r][c];
+                    k++;
                 }
-                
-               
+                toDown -= 2;
             }
-                left++;// Move the left boundary right
+
+            if (k < rows * cols) {
+                for (int i = 0 ; i < toLeft ; i++) {
+                    c--;
+                    answer [k] = values[r][c];
+                    k++;
+                }
+                toLeft -= 2;
+            }
+
+            if (k < rows * cols) {
+                for (int i = 0 ; i < toUp ; i++) {
+                    r--;
+                    answer [k] = values[r][c];
+                    k++;
+                }
+                toUp -= 2;
+            }
         }
-        System.out.print("}");
-        
-    
-    
-        return null;
+
+        return answer;
     }
 
     /*
@@ -115,42 +109,44 @@ public class Exercises {
 
         if you're familiar with lists and arraylists, you can also edit method's body to use them instead of array
     */
-    public int[][] intPartitions(int n)
-        {
-            List<List<Integer>> result = new ArrayList<>();
+    public int[][] intPartitions(int n) {
+        int count = countPartitions(n, n);
+        int[][] result = new int[count][n];
+        int[] buffer = new int[n];
+        fillPartitions(n, n, buffer, 0, result, new int[]{0});
+        return trimArray(result, count, n);
+    }
 
-            partitionGeneration(n, n, new ArrayList<>(), result);
+    private int countPartitions(int n, int max) {
+        if (n == 0) return 1;
+        if (n < 0 || max == 0) return 0;
+        return countPartitions(n - max, max) + countPartitions(n, max - 1);
+    }
 
-            // Convert the list of lists to an array
-            int[][] finalResult = new int[result.size()][];
-            for (int i = 0; i < result.size(); i++)
-            {
-                finalResult[i] = new int[result.get(i).size()];
-                for (int j = 0; j < result.get(i).size(); j++)
-                {
-                    finalResult[i][j] = result.get(i).get(j);
-                }
-            }
-            return finalResult;
+    private void fillPartitions(int n, int max, int[] buffer, int index, int[][] result, int[] count) {
+        if (n == 0) {
+            System.arraycopy(buffer, 0, result[count[0]], 0, index);
+            count[0]++;
+            return;
         }
-
-        // Recursive function for partition generation
-        private void partitionGeneration(int n, int max, List<Integer> current, List<List<Integer>> result)
-        {
-            if (n == 0)
-            {
-                result.add(new ArrayList<>(current)); // Add the current partition to the result
-                return;
-            }
-
-            // Iterate from max to 1 to generate unique partitions
-            for (int i = Math.min(max, n); i >= 1; i--)
-            {
-                current.add(i);
-                partitionGeneration(n - i, i, current, result);
-                current.remove(current.size() - 1);
-            }
+        for (int i = Math.min(n, max); i >= 1; i--) {
+            buffer[index] = i;
+            fillPartitions(n - i, i, buffer, index + 1, result, count);
         }
+    }
+
+    private int[][] trimArray(int[][] result, int count, int n) {
+        int[][] finalResult = new int[count][];
+        for (int i = 0; i < count; i++) {
+            int length = 0;
+            while (length < n && result[i][length] != 0) {
+                length++;
+            }
+            finalResult[i] = new int[length];
+            System.arraycopy(result[i], 0, finalResult[i], 0, length);
+        }
+        return finalResult;
+    }
 
     public static void main(String[] args) {
         // you can test your code here
